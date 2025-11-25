@@ -18,3 +18,6 @@ dry run to yaml file
 
 Create service from pod
 > oc expose 
+
+Create a unified kustomization manifest from setups
+oc kustomize core/prod > prod_core.yaml
