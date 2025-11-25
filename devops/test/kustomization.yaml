@@ -2,12 +2,3 @@ namespace: core-omero-devops-test
 
 resources:
   - ../base
-
-patches:
-  - target:
-      kind: RoleBinding
-      name: omero-restart-rb
-    patch: |-
-      - op: replace
-        path: /subjects/0/namespace
-        value: core-omero-devops-test

@@ -2,4 +2,3 @@
 resources: 
 - cron-restart-omero-server.yaml
 - sa-in-devops.yaml
-- rbac-role-omero-restart.yaml

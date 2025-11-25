@@ -2,3 +2,4 @@ resources:
 
 #  - redis-omero.yaml
   - rolebinding-omero-restart.yaml
+  - rbac-role-omero-restart.yaml
