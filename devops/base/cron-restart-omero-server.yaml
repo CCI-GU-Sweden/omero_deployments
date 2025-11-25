@@ -1,0 +1,24 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: omero-weekly-restart
+spec:
+  schedule: "0 3 * * 0"   # 03:00 every Sunday (cluster timezone)
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: omero-restart-sa
+          restartPolicy: Never
+          containers:
+            - name: oc-cli
+              image: quay.io/openshift/origin-cli:4.14
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  echo "Restarting OMERO pods with label omero-server..."
+                  oc delete pod -n core-omero-test -l app=omero-server
+                  echo "OMERO restart job done."

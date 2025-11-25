@@ -1,0 +1,4 @@
+resources: 
+
+#  - redis-omero.yaml
+  - rolebinding-omero-restart.yaml

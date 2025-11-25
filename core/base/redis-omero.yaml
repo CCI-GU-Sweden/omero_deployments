@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: redis-omero
+  name: redis-omero
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis-omero
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: redis-omero
+    spec:
+      containers:
+      - image: public.ecr.aws/bitnami/redis:8.2.2-debian-12-r0
+        name: redis
+        env: [ 
+          { name: ALLOW_EMPTY_PASSWORD, value: "yes" },
+          { name: REDIS_PASSWORD, value: "redis" }
+        ]
+        resources: {}
+status: {}

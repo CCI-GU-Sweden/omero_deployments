@@ -1,0 +1,17 @@
+apiVersion: v1
+data:
+  local-uwsgi.ini: |2
+
+    [uwsgi]
+
+    post-buffering = 0
+    buffer-size = 8192
+    http-timeout = 3600
+    disable-write-exception = true
+    socket-timeout = 3600
+kind: ConfigMap
+metadata:
+  creationTimestamp: "2025-10-20T11:41:58Z"
+  name: local-uwsgi.ini
+  resourceVersion: "5159565839"
+  uid: 0fc5cd3b-afca-4f8c-aa71-63dbd04d48df

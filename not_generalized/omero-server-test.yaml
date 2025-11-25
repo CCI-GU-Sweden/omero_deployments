@@ -1,0 +1,147 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "8"
+  creationTimestamp: "2024-12-01T13:30:42Z"
+  generation: 10
+  labels:
+    app: omero-server
+    app.kubernetes.io/component: omero-server
+    app.kubernetes.io/instance: omero-server
+    app.kubernetes.io/name: omero-server
+  name: omero-server
+  namespace: core-omero-test
+  resourceVersion: "5133636691"
+  uid: a048693f-bce6-42a3-abd3-15d3e468a92a
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: omero-server
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        openshift.openshift.io/restartedAt: "2025-10-10T13:47:00.803Z"
+      creationTimestamp: null
+      labels:
+        app: omero-server
+    spec:
+      containers:
+      - env:
+        - name: CONFIG_omero_db_host
+          value: omero-postgres-server
+        - name: CONFIG_omero_Ice_IPv6
+          value: "0"
+        - name: CONFIG_omero_db_pass
+          valueFrom:
+            secretKeyRef:
+              key: POSTGRESQL_PASSWORD
+              name: postgresql-secret
+        - name: CONFIG_omero_db_user
+          valueFrom:
+            secretKeyRef:
+              key: POSTGRESQL_USER
+              name: postgresql-secret
+        - name: CONFIG_omero_db_name
+          valueFrom:
+            secretKeyRef:
+              key: POSTGRESQL_DATABASE
+              name: postgresql-secret
+        - name: ROOTPASS
+          valueFrom:
+            secretKeyRef:
+              key: password
+              name: omero-server-root-password
+        image: registry.k8s.gu.se/openshift/omero-server:1.5
+        imagePullPolicy: Always
+        name: omero-server
+        ports:
+        - containerPort: 4063
+          protocol: TCP
+        - containerPort: 4064
+          protocol: TCP
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /omero
+          name: omero
+        - mountPath: /OMERO
+          name: cap-omero
+        - mountPath: /opt/omero/server/OMERO.server
+          name: opt-omero
+        - mountPath: /startup/60-database.sh
+          name: 60-db
+          subPath: 60-database.sh
+        - mountPath: /opt/omero/server/OMERO.server/etc/logback.xml
+          name: logback-xml
+          subPath: logback.xml
+      dnsPolicy: ClusterFirst
+      initContainers:
+      - args:
+        - "#/bin/sh              \nmkdir -p /mnt/opt\nmkdir -p /mnt/cap\ncp -rn /opt/omero/server/OMERO.server/*
+          /mnt/opt\ncp -rn /OMERO/D* /mnt/cap\ncp -rn /OMERO/F* /mnt/cap\ncp -rn /OMERO/Man*
+          /mnt/cap\ncp -rn /OMERO/Pix* /mnt/cap\ncp -rn /OMERO/Thu* /mnt/cap\n"
+        command:
+        - /bin/bash
+        - -c
+        image: registry.k8s.gu.se/openshift/omero-server:1.5
+        imagePullPolicy: IfNotPresent
+        name: init-copy
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /mnt/opt
+          name: opt-omero
+        - mountPath: /mnt/cap
+          name: cap-omero
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: omero
+        persistentVolumeClaim:
+          claimName: omero
+      - name: cap-omero
+        persistentVolumeClaim:
+          claimName: cap-omero-economy
+      - name: opt-omero
+        persistentVolumeClaim:
+          claimName: opt-omero
+      - configMap:
+          defaultMode: 493
+          name: 60-db-cf
+        name: 60-db
+      - configMap:
+          defaultMode: 493
+          name: logback.xml
+        name: logback-xml
+status:
+  availableReplicas: 1
+  conditions:
+  - lastTransitionTime: "2024-12-01T13:30:42Z"
+    lastUpdateTime: "2025-10-10T13:47:08Z"
+    message: ReplicaSet "omero-server-655fcbd958" has successfully progressed.
+    reason: NewReplicaSetAvailable
+    status: "True"
+    type: Progressing
+  - lastTransitionTime: "2025-10-13T06:26:52Z"
+    lastUpdateTime: "2025-10-13T06:26:52Z"
+    message: Deployment has minimum availability.
+    reason: MinimumReplicasAvailable
+    status: "True"
+    type: Available
+  observedGeneration: 10
+  readyReplicas: 1
+  replicas: 1
+  updatedReplicas: 1
